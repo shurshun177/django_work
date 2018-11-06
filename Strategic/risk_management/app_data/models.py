@@ -3,46 +3,44 @@ from djongo import models
 
 # Create your models here.
 class Version(models.Model):
-    version_number = models.AutoField(unique=True, default=1000)
-    hospital_type = models.CharField(max_length=1)
-    version_name = models.CharField(max_length=72)
-    version_type = models.CharField(max_length=1)
-    active = models.CharField(max_length=1)
-    hospital_code = models.CharField()      #??????????
-    #business_topic = models.CharField()            ???????????
-    measure = object
-    created_at = models.DateTimeField(auto_now_add=True, null=True,
-                                      verbose_name='Created_At')
-    updated_at = models.DateTimeField(verbose_name='Update_At')
-    create_user = models.CharField(max_length=28)
-    update_user = models.CharField(max_length=28)
-    cancel = models.BooleanField(max_length=1)
-    cancel_date = models.DateTimeField()
-    cancel_user = models.CharField(max_length=28)
+    version_number = models.IntegerField(unique=True, default=1000)
+    hospital_type = models.CharField(max_length=1, default='1')
+    version_name = models.CharField(blank=True, max_length=72)
+    version_type = models.CharField(blank=True, max_length=1)
+    version_desc = models.CharField(blank=True, max_length=121)
+    active = models.CharField(blank=True, max_length=1)
+    #hospital_code = models.CharField()      #??????????
+    #business_topic = models.CharField()
+    measure = models.ArrayReferenceField(blank=True, to='Measure')
+    create_date = models.DateTimeField(blank=True, auto_now_add=True, null=True)
+    create_user = models.CharField(blank=True, max_length=28)
+    change_date = models.DateTimeField(blank=True)
+    change_user = models.CharField(blank=True, max_length=28)
+    cancel = models.BooleanField(blank=True, max_length=1)
+    cancel_date = models.DateTimeField(blank=True, )
+    cancel_user = models.CharField(blank=True, max_length=28)
 
     def __str__(self):
         return self.version_name
 class Measure(models.Model):
-    measure_code = models.CharField(unique=True, max_length=32)
+    measure_code = models.CharField(unique=True,                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                max_length=32)
     hospital_type = models.CharField(max_length=1)
-    measure_name = models.CharField(max_length=64,
-                                    verbose_name='Measure_Name')
-    measure_desc = models.TextField(max_length=200,
-                                    verbose_name='Measure_Desc')
-    business_topic = models.CharField()
+    measure_name = models.CharField(max_length=64)
+    measure_desc = models.TextField(max_length=200)
+    business_topic = models.CharField(max_length=24)
     criteria_inclusion = models.CharField(max_length=72)
     removal_criteria = models.CharField(max_length=72)
     numerator = models.CharField(max_length=64)
     denominator = models.CharField(max_length=64)
     measure_type = models.CharField(max_length=64)
     measuring_frequency = models.CharField(max_length=64)
-    unit_measure = models.CharField(max_length=1)
+    measure_unit = models.IntegerField()
     digit_num = models.IntegerField()
     separate_thousands = models.BooleanField(max_length=1)
     active = models.CharField(max_length=1, verbose_name='Active')
     from_date = models.DateTimeField(verbose_name='From_Date')
     to_date = models.DateTimeField(verbose_name='To_Date')
-    target = models.CharField(max_length=64,verbose_name='Target')
+    target_default = models.FloatField()
     remarks = models.TextField(max_length=484, blank=True, null=True)
     create_date = models.DateTimeField()
     create_user = models.CharField(max_length=28)
@@ -52,21 +50,23 @@ class Measure(models.Model):
     cancel_date = models.DateTimeField()
     cancel_user = models.CharField(max_length=28)
     def __str__(self):
-        return self.measure_name
+        return self.measure_code
+
+
 
 class DecryptionTables(models.Model):
-    version_type =
-    #hospital_type =
-    #measure_type =
-    #active_status =
-    #business_topic =
-    #measure_frequency =
+    name = models.CharField(max_length=32)
+    values_list = models.ListField()
+    def __str__(self):
+        return self.name
 
 class ActualExecution(models.Model):
-    version_number = models.IntegerField()
-    measure_code = models.CharField(max_length=32)
+    version_number = models.IntegerField(unique=True, default=1000)
+    measure_code = models.CharField(unique=True, max_length=32)
     hospital_type = models.CharField(max_length=1)
-    measure_value = object
+    hospital_code = models.CharField(unique=True, max_length=6)
+    actual_value = object
+    measure_value = models.IntegerField()
     create_date = models.DateTimeField()
     create_user = models.CharField(max_length=28)
     change_date = models.DateTimeField()
