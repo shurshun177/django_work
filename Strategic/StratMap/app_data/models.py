@@ -14,23 +14,23 @@ class Version(models.Model):
     version_name = models.CharField(max_length=72)
     version_type = models.CharField(max_length=1)
     version_desc = models.CharField(max_length=121)
-    active = models.CharField(max_length=1)
+    active = models.BooleanField(max_length=1)
     #hospital_code = models.CharField()      #??????????
     #business_topic = models.CharField()
     measure = models.ArrayReferenceField(blank=True, to='Measure')
-    create_date = models.DateTimeField(auto_now=True)
+    create_date = models.DateField(auto_now=True)
     create_user = models.CharField(
         max_length=28,
         #default=auth.user_logged_in
     )
 
-    change_date = models.DateTimeField(
+    change_date = models.DateField(
         blank=True,
         null=True
     )
     change_user = models.CharField(blank=True,max_length=28)
     cancel = models.BooleanField(max_length=1)
-    cancel_date = models.DateTimeField(
+    cancel_date = models.DateField(
         blank=True,
         null=True
     )
@@ -39,9 +39,14 @@ class Version(models.Model):
         max_length=28,
         #default=auth.user_logged_in
     )
-
-    def __str__(self):
-        return self.version_name
+    def __repr__(self):
+        return '{} {}  {}'.format(
+            self.version_name,
+            self.hospital_type,
+            self.version_number
+        )
+    #def __str__(self):
+     #   return "\n"/self.version_name
 
 
 class Measure(models.Model):
@@ -59,20 +64,20 @@ class Measure(models.Model):
     measure_unit = models.IntegerField()
     digit_num = models.IntegerField()
     separate_thousands = models.BooleanField(max_length=1)
-    active = models.CharField(max_length=1)
-    from_date = models.DateTimeField()
-    to_date = models.DateTimeField()
+    active = models.BooleanField(max_length=1)
+    from_date = models.DateField()
+    to_date = models.DateField()
     target_default = models.FloatField(default=100)
     remarks = models.TextField(
         max_length=484,
         blank=True,
     )
-    create_date = models.DateTimeField(auto_now=True)
+    create_date = models.DateField(auto_now=True)
     create_user = models.CharField(
         max_length=28,
         #default=auth.user_logged_in
     )
-    change_date = models.DateTimeField(
+    change_date = models.DateField(
         blank=True,
         null=True
     )
@@ -82,7 +87,7 @@ class Measure(models.Model):
         #default=auth.user_logged_in
     )
     cancel = models.BooleanField(max_length=1)
-    cancel_date = models.DateTimeField(
+    cancel_date = models.DateField(
         blank=True,
         null=True
     )
@@ -111,12 +116,12 @@ class ActualExecution(models.Model):
     hospital_code = models.CharField(max_length=6)
     actual_value = object
     measure_value = models.IntegerField()
-    create_date = models.DateTimeField(auto_now=True)
+    create_date = models.DateField(auto_now=True)
     create_user = models.CharField(
         max_length=28,
         #default=auth.user_logged_in
     )
-    change_date = models.DateTimeField(
+    change_date = models.DateField(
         blank=True,
         null=True
     )
@@ -126,7 +131,7 @@ class ActualExecution(models.Model):
         #default=auth.user_logged_in
     )
     cancel = models.BooleanField(max_length=1)
-    cancel_date = models.DateTimeField(
+    cancel_date = models.DateField(
         blank=True,
         null=True
     )
