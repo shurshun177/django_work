@@ -24,15 +24,38 @@ class DataBase:
     '''
 
 
-    def get_all(self, *filds, **filter):
+    def get_all(self, *filds, **filt):
         hide_fields = {i: 0 for i in filds}
-        query = self.collection.find(filter, hide_fields)
+        hide_fields['_id'] = 0
+        query = self.collection.find(filt, hide_fields)
         return query
+
+    #def update_doc(self,):
 
 
 if __name__ == '__main__':
-    v1 = DataBase("app_data_version")
-    values_list = [i for i in v1.get_all('_id', 'cancel', version_number=1000)]
-    print(values_list)
+    v = DataBase("app_data_version")
+
+
+    test_vers = {
+        'version_number': 1003,
+        'hospital_type': '1',
+        'version_name': 'test_vers',
+        'version_type': '1',
+        'version_desc': 'test',
+        'active': True,
+        'measure_id': [],
+        'cancel': False,
+        'create_user': 'artur',
+        'change_date': None,
+        'change_user': '',
+        'cancel_date': None,
+        'cancel_user': ''
+    }
+    #a = v.collection.insert_one(test_vers)
+    k = [i for i in v.collection.find()]
+    print(k)
+
+
 
 

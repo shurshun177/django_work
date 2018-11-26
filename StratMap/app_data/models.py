@@ -2,7 +2,7 @@
 
 from djongo import models
 from django.utils import timezone
-from django.contrib import auth
+from django.contrib.auth.models import User
 
 
 # Create your models here.
@@ -10,9 +10,9 @@ from django.contrib import auth
 
 class Version(models.Model):
     version_number = models.IntegerField(default=1000)
-    hospital_type = models.CharField(max_length=1)
+    hospital_type = models.CharField(max_length=16)
     version_name = models.CharField(max_length=72)
-    version_type = models.CharField(max_length=1)
+    version_type = models.CharField(max_length=12)
     version_desc = models.CharField(max_length=121)
     active = models.BooleanField(max_length=1)
     #hospital_code = models.CharField()      #??????????
@@ -39,14 +39,25 @@ class Version(models.Model):
         max_length=28,
         #default=auth.user_logged_in
     )
+
     def __repr__(self):
         return '{} {}  {}'.format(
             self.version_name,
             self.hospital_type,
             self.version_number
         )
-    #def __str__(self):
-     #   return "\n"/self.version_name
+
+    def create(self):
+        pass
+
+    def update(self):
+        pass
+
+    def cancel(self):
+        self.cancel = True
+        self.cancel_date = timezone.now()
+        self.cancel_user = User.username
+        self.save()
 
 
 class Measure(models.Model):
@@ -100,13 +111,10 @@ class Measure(models.Model):
     def __str__(self):
         return self.measure_code
 
-
-class DecryptionTables(models.Model):
-    name = models.CharField(max_length=32)
-    values_list = models.ListField()
-
-    def __str__(self):
-        return self.name
+    def cancel(self):
+        self.cancel = True
+        self.cancel_date = timezone.now()
+        #self.cancel_user =
 
 
 class ActualExecution(models.Model):
@@ -139,3 +147,8 @@ class ActualExecution(models.Model):
         blank=True,
         max_length=28
     )
+
+
+class DecryptionTables(models.Model):
+    name = models.CharField(max_length=32)
+    values_list = models.ListField()
