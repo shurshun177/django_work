@@ -8,6 +8,10 @@ urlpatterns = [
         views.index,
         name='v'
     ),
+    url(
+        r'^api/v0/test/$',
+        views.index_0
+    ),
     url(r'^api/v0/versions/$',
         views.versions,
         name='versions'
@@ -16,15 +20,32 @@ urlpatterns = [
         views.get_version,
         name='vers_id'
         ),
+    url(
+        r'^api/v0/version/update/$',
+        views.update_version,
+        name='update_verasion'
+    ),
     url(r'^api/v0/measures/$',
-        views.get_measures,
+        views.measures,
         name='measures'
         ),
-    url(r'^api/v0/measures/(?P<measure_id>\d+)/$',
+    url(r'^api/v0/measures/get_one/$',
         views.get_measure,
         name='measure_id'
         ),
-    url(r'^api/v1.0/post/$', views.post_test)
+    url(
+        r'^api/v0/measure/update/$',
+        views.update_measure,
+        name='update_measure'
+    ),
+    url(
+        r'^api/v0/version/update_del/(?P<vers_id>\d+)/$',
+        views.del_vers
+    ),
+    url(
+        r'^api/v0/measure/update_del/(?P<measure_id>\d+)/$',
+        views.del_measure
+    )
 
 
 ]

@@ -77,10 +77,10 @@ WSGI_APPLICATION = 'StratMap.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'djongo',
-        'NAME': '',
+        'NAME': 'StrategicMap',
         'USER': '',
         'PASSWORD': '',
-        'HOST': 'localhost',
+        'HOST': '192.168.34.6',
         'PORT': 27017,
         'ENFORCE_SCHEMA': True
     }

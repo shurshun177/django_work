@@ -18,7 +18,7 @@ class Version(models.Model):
     #hospital_code = models.CharField()      #??????????
     #business_topic = models.CharField()
     measure = models.ArrayReferenceField(blank=True, to='Measure')
-    create_date = models.DateField(auto_now=True)
+    create_date = models.DateField(auto_now=True, blank=True)
     create_user = models.CharField(
         max_length=28,
         #default=auth.user_logged_in
@@ -46,18 +46,6 @@ class Version(models.Model):
             self.hospital_type,
             self.version_number
         )
-
-    def create(self):
-        pass
-
-    def update(self):
-        pass
-
-    def cancel(self):
-        self.cancel = True
-        self.cancel_date = timezone.now()
-        self.cancel_user = User.username
-        self.save()
 
 
 class Measure(models.Model):
