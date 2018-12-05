@@ -16,35 +16,39 @@ urlpatterns = [
         views.versions,
         name='versions'
         ),
-    url(r'^api/v0/versions/(?P<vers_id>\d+)/$',
+    url(r'^api/v0/versions/(?P<vers_id>\S+)/$',
         views.get_version,
         name='vers_id'
         ),
     url(
-        r'^api/v0/version/update/$',
+        r'^api/v0/version/update/(?P<vers_id>\S+)/$',
         views.update_version,
-        name='update_verasion'
+        name='update_version'
     ),
     url(r'^api/v0/measures/$',
         views.measures,
         name='measures'
         ),
-    url(r'^api/v0/measures/get_one/$',
+    url(r'^api/v0/measures/(?P<id>\S+)/$',
         views.get_measure,
         name='measure_id'
         ),
     url(
-        r'^api/v0/measure/update/$',
+        r'^api/v0/measure/update/(?P<measure_id>\S+)/$',
         views.update_measure,
         name='update_measure'
     ),
     url(
-        r'^api/v0/version/update_del/(?P<vers_id>\d+)/$',
+        r'^api/v0/version/del_vers/(?P<vers_id>\S+)/$',
         views.del_vers
     ),
     url(
-        r'^api/v0/measure/update_del/(?P<measure_id>\d+)/$',
+        r'^api/v0/measure/del_measure/(?P<measure_id>\S+)/$',
         views.del_measure
+    ),
+    url(
+        r'^api/v0/available_measures/$',
+        views.available_measures
     )
 
 

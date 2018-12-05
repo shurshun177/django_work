@@ -1,11 +1,9 @@
-from . models import Version, Measure, DecryptionTables
 from django.http import HttpResponse, JsonResponse
 from . database import DataBase
-from .odm import MongoDBManager
-import bson
+import datetime
 import json
-from bson import ObjectId
 from bson.json_util import dumps
+from django.contrib.auth.models import User
 
 db = DataBase()
 db.connect()
@@ -13,14 +11,34 @@ db.connect()
 
 def del_vers(request, vers_id):
     if request.method == 'PUT':
-        k = 'Version_del property was updated, arg is {}'.format(vers_id)
-        return HttpResponse(k)
+        current_date = datetime.datetime.utcnow()
+        data = {}
+        data['cancel'] = True
+        data['cancel_date'] = current_date
+        data['cancel_user'] = 'Rasgildyai'
+        try:
+            query = db.update('app_data_version', data, vers_id)
+            if query is None:
+                return HttpResponse(status=404, content='No such version')
+        except:
+            return HttpResponse(status=400, content='Invalid id')
+        return HttpResponse(query)
 
 
 def del_measure(request, measure_id):
     if request.method == 'PUT':
-        k = 'Measure_del property was updated, arg is {}'.format(measure_id)
-        return HttpResponse(k)
+        current_date = datetime.datetime.utcnow()
+        data = {}
+        data['cancel'] = True
+        data['cancel_date'] = current_date
+        data['cancel_user'] = 'Rasgildyai'
+        try:
+            query = db.update('app_data_measure', data, measure_id)
+            if query is None:
+                return HttpResponse(status=404, content='No such measure')
+        except:
+            return HttpResponse(status=400, content='Invalid id')
+        return HttpResponse(query)
 
 
 def index(request):
@@ -32,66 +50,87 @@ def index(request):
     return JsonResponse(result)
 
 def index_0(request):
-    if request.method == 'GET':
-        id = request.body
-        return HttpResponse(id)
-    else:
-        return HttpResponse('Request method must be GET')
+    if request.method == 'POST':
+        body = request.body
+        data = json.loads(body)
+        current_date = datetime.datetime.utcnow()
+        data['cancel'] = False
+        data['create_date'] = current_date
+        data['create_user'] = 'Shnur'
+        try:
+            query = db.post('app_data_version', data)
+        except:
+            return HttpResponse(status=400, content='Unique fields exist')
+        return HttpResponse(query)
 
 
 def versions(request):
     if request.method == 'GET':
-        query = db.find("app_data_version")
+        query = db.find("app_data_version", {'cancel': False})
         items = None
         if query.count() > 0:
             items = dumps({'items': query})
         result = json.loads(items) if items else {'items': []}
         return JsonResponse(result)
     elif request.method == 'POST':
-        return HttpResponse('Create Version POST request')
+        body = request.body
+        data = json.loads(body)
+        current_date = datetime.datetime.utcnow()
+        data['cancel'] = False
+        data['create_date'] = current_date
+        data['create_user'] = 'Shnur'
+        try:
+            query = db.post('app_data_version', data)
+        except:
+            return HttpResponse(status=422, content='Unique fields exist')
+        return HttpResponse(query)
 
 
 def get_version(request, vers_id):
     if request.method == 'GET':
-        mycol = DataBase("app_data_version")
-        query = mycol.get_all(
-            '_id',
-            'version_desc',
-            'measure_id',
-            'cancel',
-            'version_type',
-            'cancel_date',
-            'cancel_user',
-            'change_date',
-            'change_user',
-            'create_user',
-            id=int(vers_id)
-        )
-        vers_dict = [dict(i) for i in query]
-        if vers_dict:
-            return JsonResponse(vers_dict, safe=False)
+        try:
+            query = db.get_by_id('app_data_version', vers_id)
+        except:
+            return HttpResponse(status=400, content='Invalid id')
+        items = None
+        if query.count() > 0:
+            items = dumps({'items': query})
         else:
             return HttpResponse(status=404, content='No such version')
+        result = json.loads(items) if items else {'items': []}
+        return JsonResponse(result)
+    else:
+        return HttpResponse('Request method must be GET')
 
 
 def measures(request):
     if request.method == 'GET':
-        query = db.find("app_data_measure")
+        query = db.find("app_data_measure", {'cancel': False})
         items = None
         if query.count() > 0:
             items = dumps({'items': query})
         result = json.loads(items) if items else {'items': []}
         return JsonResponse(result)
     elif request.method == 'POST':
-        return HttpResponse('Create Measure POST request')
+        body = request.body
+        data = json.loads(body)
+        current_date = datetime.datetime.utcnow()
+        data['cancel'] = False
+        data['create_date'] = current_date
+        data['create_user'] = 'Sheldon'
+        try:
+            query = db.post('app_data_measure', data)
+        except:
+            return HttpResponse(status=422, content='Unique fields exist')
+        return HttpResponse(query)
 
 
-def get_measure(request):
+def get_measure(request, id):
     if request.method == 'GET':
-        _id = request.body.decode().split('=')[-1]
-        if not db.is_valid_id(_id):
+        try:
+            query = db.get_by_id('app_data_measure', id)
+        except:
             return HttpResponse(status=400, content='Invalid id')
-        query = db.get_by_id("app_data_measure", _id)
         items = None
         if query.count() > 0:
             items = dumps({'items': query})
@@ -99,17 +138,53 @@ def get_measure(request):
             return HttpResponse(status=404, content='No such measure')
         result = json.loads(items) if items else {'items': []}
         return JsonResponse(result)
+    else:
+        return HttpResponse('Request method must be GET')
 
 
-def update_measure(request):
+def update_measure(request, measure_id):
     if request.method == 'PUT':
-        return HttpResponse('Update Measure PUT request')
+        body = request.body
+        data = json.loads(body)
+        current_date = datetime.datetime.utcnow()
+        data['change_date'] = current_date
+        data['change_user'] = 'Terminator'
+        try:
+            query = db.update('app_data_measure', data, measure_id)
+            if query is None:
+                return HttpResponse(status=404, content='No such measure')
+        except:
+            return HttpResponse(status=400, content='Invalid id')
+        return HttpResponse(query)
 
 
-def update_version(request):
+def update_version(request, vers_id):
     if request.method == 'PUT':
-        return HttpResponse('Update Version PUT request')
+        body = request.body
+        data = json.loads(body)
+        current_date = datetime.datetime.utcnow()
+        data['change_date'] = current_date
+        data['change_user'] = 'Tarsan'
+        try:
+            query = db.update('app_data_version', data, vers_id)
+            if query is None:
+                return HttpResponse(status=404, content='No such version')
+        except:
+            return HttpResponse(status=400, content='Invalid id')
+        return HttpResponse(query)
 
+
+def available_measures(request):
+    try:
+        query = db.find("app_data_measure",
+                        {'active': True, 'hospital_type': '2', 'business_topic': 'פעילות'}, fields={'measure_name': 1})
+    except:
+        return HttpResponse(status=400)
+    items = None
+    if query.count() > 0:
+        items = dumps({'items': query})
+    result = json.loads(items) if items else {'items': []}
+    return JsonResponse(result)
 
 
 

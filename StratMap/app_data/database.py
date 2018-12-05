@@ -1,6 +1,11 @@
 from pymongo import MongoClient
 from bson.objectid import ObjectId
+from pymongo import ReturnDocument
 import re
+import datetime
+
+from bson.json_util import dumps
+
 
 class DataBase:
 
@@ -31,19 +36,32 @@ class DataBase:
         query = self.db[col].find(filter=filter, projection=fields)
         return query
 
-    def update_doc(self, id, **kwargs):
-        query = {'id': id}
-        new_values = {'$set': kwargs}
-        #self.collection.update_one(query, new_values)
+    def update(self, col, data, id):
+        query = {'_id': ObjectId(id)}
+        data = {'$set': data}
+        return self.db[col].find_one_and_update(filter=query, update=data,
+                                                        return_document=ReturnDocument.AFTER)
 
     def get_by_id(self, collection, id):
+
         query = dict()
+
         query['_id'] = ObjectId(id)
         res = self.db[collection].find(query)
         return res
 
+    def post(self, collection, data):  # data is dict
+        res = self.db[collection].insert_one(data)
+        return res.inserted_id
+
     def is_valid_id(self, _id):
         return  (isinstance(_id, str) and re.match("[\d\w]{24}", _id)) or isinstance(_id, ObjectId)
+
+    def delete(self, collection, id):
+        data = {'_id': ObjectId(id)}
+        query =  self.db[collection].delete_one(data)
+
+
 
 
 
@@ -68,10 +86,49 @@ if __name__ == '__main__':
         'cancel_user': ''
     }
     #a = v.collection.insert_one(test_vers)
-    #v = DataBase()
-    #v.connect()
-    #print([i for i in v.get_by_id('app_data_measure', '5bffc610326f4225e4ff69f9')])
+    def up():
+        v = DataBase()
+        v.connect()
+        d = datetime.datetime.utcnow()
+        data = {'cancel': True, 'cancel_user': 'CAeldon', 'cancel_date': d}
+        v.update('app_data_measure', data, '5bffc61a326f421b74873460')
+
+    def fin():
+        v = DataBase()
+        v.connect()
+        k = v.find('app_data_measure', filter={'cancel_date': None}, fields={'cancel_date': 1})
+        print([i for i in k])
+
+    def del_test(col, list_id):
+        v = DataBase()
+        v.connect()
+        for i in list_id:
+            v.delete(col, i)
+
+    def del_measure_false():
+        v = DataBase()
+        v.connect()
+        data = {}
+        data['cancel'] = False
+        list_id = ['5bffc72c326f4227047ed645', '5bffc61a326f421b74873460', '5bffc610326f4225e4ff69f9']
+        for i in list_id:
+            query = v.update('app_data_measure', data, i)
+            if query is None:
+                print('Operation was refused')
 
 
+    def del_vers_false():
+        v = DataBase()
+        v.connect()
+        data = {}
+        data['cancel'] = False
+        list_id = ['5bffc72c326f4227047ed645', '5bffc61a326f421b74873460', '5bffc610326f4225e4ff69f9']
+        for i in list_id:
+            query = v.update('app_data_version', data, i)
+            if query is None:
+                print('Operation was refused')
+
+
+    del_test('app_data_measure', ['5c07fcd8326f4209fcbcda32', '5c07fd12326f4209fcbcda33', '5c07fd9e326f42393c2a13a8'])
 
 
