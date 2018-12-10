@@ -21,7 +21,7 @@ def del_vers(request, vers_id):
             if query is None:
                 return HttpResponse(status=404, content='No such version')
         except:
-            return HttpResponse(status=400, content='Invalid id')
+            return HttpResponse(status=422, content='Invalid id')
         return HttpResponse(query)
 
 
@@ -37,7 +37,7 @@ def del_measure(request, measure_id):
             if query is None:
                 return HttpResponse(status=404, content='No such measure')
         except:
-            return HttpResponse(status=400, content='Invalid id')
+            return HttpResponse(status=422, content='Invalid id')
         return HttpResponse(query)
 
 
@@ -60,7 +60,7 @@ def index_0(request):
         try:
             query = db.post('app_data_version', data)
         except:
-            return HttpResponse(status=400, content='Unique fields exist')
+            return HttpResponse(status=422, content='Unique fields exist')
         return HttpResponse(query)
 
 
@@ -91,7 +91,7 @@ def get_version(request, vers_id):
         try:
             query = db.get_by_id('app_data_version', vers_id)
         except:
-            return HttpResponse(status=400, content='Invalid id')
+            return HttpResponse(status=422, content='Invalid id')
         items = None
         if query.count() > 0:
             items = dumps({'items': query})
@@ -130,7 +130,7 @@ def get_measure(request, id):
         try:
             query = db.get_by_id('app_data_measure', id)
         except:
-            return HttpResponse(status=400, content='Invalid id')
+            return HttpResponse(status=422, content='Invalid id')
         items = None
         if query.count() > 0:
             items = dumps({'items': query})
@@ -154,7 +154,7 @@ def update_measure(request, measure_id):
             if query is None:
                 return HttpResponse(status=404, content='No such measure')
         except:
-            return HttpResponse(status=400, content='Invalid id')
+            return HttpResponse(status=422, content='Invalid id')
         return HttpResponse(query)
 
 
@@ -170,7 +170,7 @@ def update_version(request, vers_id):
             if query is None:
                 return HttpResponse(status=404, content='No such version')
         except:
-            return HttpResponse(status=400, content='Invalid id')
+            return HttpResponse(status=422, content='Invalid id')
         return HttpResponse(query)
 
 
@@ -179,7 +179,7 @@ def available_measures(request):
         query = db.find("app_data_measure",
                         {'active': True, 'hospital_type': '2', 'business_topic': 'פעילות'}, fields={'measure_name': 1})
     except:
-        return HttpResponse(status=400)
+        return HttpResponse(status=422)
     items = None
     if query.count() > 0:
         items = dumps({'items': query})
