@@ -13,7 +13,7 @@ urlpatterns = [
         views.index_0
     ),
     url(r'^api/v0/versions/$',
-        views.versions,
+        views.index_0,
         name='versions'
         ),
     url(r'^api/v0/versions/(?P<vers_id>\S+)/$',
@@ -49,7 +49,11 @@ urlpatterns = [
     url(
         r'^api/v0/available_measures/$',
         views.available_measures
-    )
+    ),
+url(
+        r'^api/v0/tables/(?P<table_name>\S+)/$',
+        views.get_dec
+    ),
 
 
 ]
