@@ -47,13 +47,16 @@ urlpatterns = [
         views.del_measure
     ),
     url(
-        r'^api/v0/available_measures/$',
+        r'^api/v0/available_measures/(?P<topic>\d+)/(?P<code>\d+)/$',
         views.available_measures
     ),
-url(
-        r'^api/v0/tables/(?P<table_name>\S+)/$',
+    url(
+        r'^api/v0/tables/$',
         views.get_dec
     ),
-
+    url(
+        r'^api/v0/last_version/$',
+        views.last_version
+    ),
 
 ]

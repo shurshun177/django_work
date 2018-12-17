@@ -64,9 +64,12 @@ def index_0(request):
     elif request.method == 'POST':
         body = request.body
         data = json.loads(body)
-        if not data['version_desc']:
-            print('Nu i dela....')
+        try:
+            number = int(data['version_number'])
+        except ValueError:
+            return HttpResponse(status=400)
         current_date = datetime.datetime.utcnow()
+        data['version_number'] = number
         data['cancel'] = False
         data['create_date'] = current_date
         data['create_user'] = 'Shnur'
@@ -89,6 +92,7 @@ def versions(request):
     elif request.method == 'POST':
         body = request.body
         data = json.loads(body)
+
         current_date = datetime.datetime.utcnow()
         data['cancel'] = False
         data['create_date'] = current_date
@@ -189,10 +193,16 @@ def update_version(request, vers_id):
 
 
 @require_GET
-def available_measures(request):
+def available_measures(request, topic, code):
     try:
-        query = db.find("app_data_measure",
-                        {'active': True, 'hospital_type': '2', 'business_topic': 'פעילות'}, fields={'measure_name': 1})
+        query = db.find(
+            "app_data_measure",
+            {
+                'active': True, 'cancel': False,
+                'hospital_type': code,
+                'business_topic': topic
+            },
+            fields={'measure_name'})
     except:
         return HttpResponse(status=422)
     items = None
@@ -203,14 +213,31 @@ def available_measures(request):
 
 
 @require_GET
-def get_dec(request, table_name):
+def get_dec(request):
 
     try:
-        query = db.find('app_data_decryptiontables', filter={'name': table_name})
-        res = query[0]['values_list']
+        query = db.find('app_data_decryptiontables')
     except:
-        return HttpResponse(status=404)
-    return JsonResponse(res, safe=False)
+        return HttpResponse(status=422)
+    items = None
+    if query.count() > 0:
+        items = dumps({'items': query})
+    result = json.loads(items) if items else {'items': []}
+    return JsonResponse(result, safe=False)
+
+
+@require_GET
+def last_version(request):
+    col = 'app_data_version'
+    key = 'create_date'
+
+    try:
+        query = db.get(col, sorted_by=key, ascending=False, limit=1)
+    except:
+        return HttpResponse(status=422)
+    val = [i.get('version_number') for i in query][0]
+    res = {'vers_number': val + 1}
+    return JsonResponse(res)
 
 
 

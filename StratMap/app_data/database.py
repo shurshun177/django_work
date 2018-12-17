@@ -1,4 +1,5 @@
 from pymongo import MongoClient
+from pymongo import ASCENDING, DESCENDING
 from bson.objectid import ObjectId
 from pymongo import ReturnDocument
 import re
@@ -31,16 +32,28 @@ class DataBase:
     '''
 
 
-    def find(self, col, filter={}, fields=None):
+    def find(self, col, filter={}, fields=None, skip=0, limit=1000):
 
-        query = self.db[col].find(filter=filter, projection=fields)
+        query = self.db[col].find(filter=filter, projection=fields, skip=skip, limit=limit)
         return query
 
+    def get(self, col, sorted_by=None, ascending=True, fields=None, skip=0, limit=1000):
+        query = {}
+        sort = None
+        if sorted_by:
+            if ascending:
+                sort = [(sorted_by, ASCENDING)]
+            else:
+                sort = [(sorted_by, DESCENDING)]
+        res = self.db[col].find(filter=query, sort=sort, projection=fields, skip=skip, limit=limit)
+        return res
+
     def update(self, col, data, id):
-        query = {'_id': ObjectId(id)}
-        data = {'$set': data}
-        return self.db[col].find_one_and_update(filter=query, update=data,
-                                                        return_document=ReturnDocument.AFTER)
+        if id and self.is_valid_id(id):
+            query = {'_id': ObjectId(id)}
+            data = {'$set': data}
+            return self.db[col].find_one_and_update(filter=query, update=data,
+                                                    return_document=ReturnDocument.AFTER)
 
     def get_by_id(self, collection, id):
 
@@ -59,9 +72,18 @@ class DataBase:
 
     def delete(self, collection, id):
         data = {'_id': ObjectId(id)}
-        query =  self.db[collection].delete_one(data)
+        query = self.db[collection].delete_one(data)
 
+    def cancel_false(self, col, query, data):
+        data = {'$set': data}
+        return self.db[col].find_one_and_update(filter=query, update=data,
+                                                return_document=ReturnDocument.AFTER)
 
+    def exists(self, col, query={}):
+        return self.db[col].count(filter=query)
+
+    def del_all(self, col, query):
+        return self.db[col].delete_many(query)
 
 
 
@@ -70,22 +92,7 @@ if __name__ == '__main__':
 
 
 
-    test_vers = {
-        'version_number': 1000,
-        'hospital_type': '1',
-        'version_name': 'גרסה ינואר-אפריל 2018',
-        'version_type': '1',
-        'version_desc': 'test',
-        'active': True,
-        'measure_id': [],
-        'cancel': False,
-        'create_user': 'artur',
-        'change_date': None,
-        'change_user': '',
-        'cancel_date': None,
-        'cancel_user': ''
-    }
-    #a = v.collection.insert_one(test_vers)
+
     def up():
         v = DataBase()
         v.connect()
@@ -105,30 +112,69 @@ if __name__ == '__main__':
         for i in list_id:
             v.delete(col, i)
 
-    def del_measure_false():
+
+    def canc_false(col):
         v = DataBase()
         v.connect()
-        data = {}
-        data['cancel'] = False
-        list_id = ['5bffc72c326f4227047ed645', '5bffc61a326f421b74873460', '5bffc610326f4225e4ff69f9']
-        for i in list_id:
-            query = v.update('app_data_measure', data, i)
-            if query is None:
-                print('Operation was refused')
+        number_of_doc = v.exists(col, {'cancel': True})
+        for i in range(number_of_doc):
+            v.cancel_false(col, {'cancel': True}, data={'cancel': False, 'cancel_user': '', 'cancel_date': ''})
 
-
-    def del_vers_false():
+    def number_cancel(col):
         v = DataBase()
         v.connect()
-        data = {}
-        data['cancel'] = False
-        list_id = ['5bffc72c326f4227047ed645', '5bffc61a326f421b74873460', '5bffc610326f4225e4ff69f9']
-        for i in list_id:
-            query = v.update('app_data_version', data, i)
-            if query is None:
-                print('Operation was refused')
+        number_of_doc = v.exists(col, {'cancel': True})
+        print(number_of_doc)
 
 
-    del_test('app_data_measure', ['5c07fcd8326f4209fcbcda32', '5c07fd12326f4209fcbcda33', '5c07fd9e326f42393c2a13a8'])
+
+    def del_dup():
+        v = DataBase()
+        v.connect()
+        print(v.is_connected())
+        v.del_all('app_data_version', {'version_name': ''})
+        v.del_all('app_data_measure', {'measure_name': ''})
 
 
+    def dec_tab(name):
+        from collections import Iterable
+        v = DataBase()
+        v.connect()
+        val = None
+        try:
+            k = v.find('app_data_decryptiontables', filter={'name': name})
+            val = k[0]['values_list']
+        except:
+            print('Database exeption')
+        return val
+
+
+    def post_test():
+        v = DataBase()
+        v.connect()
+        data = {'hospital_types': {'1':  'ללים' , '2': 'גריאטריים' , '3': 'פסיכיאטריים'}}
+        k = v.post('app_data_decryptiontables', data)
+
+
+    def new_test():
+        v = DataBase()
+        v.connect()
+        v.get('app_data_version', id='5c164722326f423ce4c54b55')
+
+    def test_get():
+        v = DataBase()
+        v.connect()
+        k = v.get('app_data_version', sorted_by='create_date', ascending=False, fields={'version_number'}, limit=1)
+        val = [i.get('version_number') for i in k][0]
+        if not isinstance(val, int):
+            res = int(val) + 1
+        else:
+            res = val + 1
+        print(res)
+    #new_test()
+    # canc_false('app_data_version')
+    # number_cancel('app_data_version')
+    #del_test('app_data_version', ['5c17bac2326f422f60cec4c2'])
+    # canc_false('app_data_measure')
+    #del_dup()
+    test_get()
