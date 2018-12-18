@@ -4,7 +4,7 @@ import datetime
 import json
 from bson.json_util import dumps
 from django.views.decorators.http import require_http_methods, require_GET
-from . valid import is_valid_code
+from . valid import is_valid_code, is_valid_version, is_valid_measure
 
 db = DataBase()
 db.connect()
@@ -64,10 +64,12 @@ def index_0(request):
     elif request.method == 'POST':
         body = request.body
         data = json.loads(body)
+        if not is_valid_version(data):
+            return HttpResponse(status=422, content='Mandatory fields are empty')
         try:
             number = int(data['version_number'])
         except ValueError:
-            return HttpResponse(status=400)
+            return HttpResponse(status=400, content='Number must be integer')
         current_date = datetime.datetime.utcnow()
         data['version_number'] = number
         data['cancel'] = False
@@ -92,7 +94,12 @@ def versions(request):
     elif request.method == 'POST':
         body = request.body
         data = json.loads(body)
-
+        if not is_valid_version(data):
+            return HttpResponse(status=422, content='Mandatory fields are empty')
+        try:
+            int(data['version_number'])
+        except ValueError:
+            return HttpResponse(status=400, content='Number must be integer')
         current_date = datetime.datetime.utcnow()
         data['cancel'] = False
         data['create_date'] = current_date
@@ -131,6 +138,8 @@ def measures(request):
     elif request.method == 'POST':
         body = request.body
         data = json.loads(body)
+        if not is_valid_measure(data):
+            return HttpResponse(status=422, content='Empty mandatory fields')
         if not is_valid_code(data['measure_code']):
             return HttpResponse(status=400)
         current_date = datetime.datetime.utcnow()

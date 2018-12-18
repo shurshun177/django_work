@@ -13,7 +13,7 @@ urlpatterns = [
         views.index_0
     ),
     url(r'^api/v0/versions/$',
-        views.index_0,
+        views.versions,
         name='versions'
         ),
     url(r'^api/v0/versions/(?P<vers_id>\S+)/$',
