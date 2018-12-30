@@ -97,18 +97,20 @@ def versions(request):
         if not is_valid_version(data):
             return HttpResponse(status=422, content='Mandatory fields are empty')
         try:
-            int(data['version_number'])
+            number = int(data['version_number'])
         except ValueError:
             return HttpResponse(status=400, content='Number must be integer')
         current_date = datetime.datetime.utcnow()
+        data['version_number'] = number
         data['cancel'] = False
         data['create_date'] = current_date
         data['create_user'] = 'Shnur'
         try:
             query = db.post('app_data_version', data)
         except:
-            return HttpResponse(status=422, content='Unique fields exist')
+            return HttpResponse(status=422, content='Database exeption')
         return HttpResponse(query)
+
 
 
 @require_GET

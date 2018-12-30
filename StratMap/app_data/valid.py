@@ -15,9 +15,7 @@ def is_valid_measure(data):
         'measure_type',
         'measure_unit',
         'business_topic',
-        'digit_num',
-        'separate_thousands',
-        'active'
+        'digit_num'
     )
     for i in fields:
         if not data[i]:
@@ -30,8 +28,7 @@ def is_valid_version(data):
         'version_number',
         'version_name',
         'version_type',
-        'hospital_type',
-        'active',
+        'hospital_type'
         # additional field measure
     )
     for i in fields:
@@ -48,7 +45,7 @@ d = {'version_number': '1002',
      'active': True,
      'business_topic': ''
      }
-print(is_valid_version(d))
+#print(is_valid_version(d))
 
 
 #print(is_valid_number(234))
