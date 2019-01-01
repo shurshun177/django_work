@@ -2,10 +2,11 @@ from django.http import HttpResponse, JsonResponse
 from . database import DataBase
 import datetime
 import json
-from bson.json_util import dumps
+from bson.json_util import dumps, loads
 from django.views.decorators.http import require_http_methods, require_GET
-from . valid import is_valid_code, is_valid_version, is_valid_measure
-
+from . valid import is_valid_code, is_valid_version, is_valid_update_version,\
+    is_valid_measure, is_valid_update_measure
+from bson.objectid import _ord
 db = DataBase()
 db.connect()
 
@@ -94,23 +95,29 @@ def versions(request):
     elif request.method == 'POST':
         body = request.body
         data = json.loads(body)
+        measures = [{'id': i['_id']['$oid'], 'measure_name': i['measure_name']} for i in data['measures']]
+        print(data)
         if not is_valid_version(data):
+
             return HttpResponse(status=422, content='Mandatory fields are empty')
         try:
             number = int(data['version_number'])
         except ValueError:
+
             return HttpResponse(status=400, content='Number must be integer')
         current_date = datetime.datetime.utcnow()
         data['version_number'] = number
         data['cancel'] = False
         data['create_date'] = current_date
         data['create_user'] = 'Shnur'
+        data['measure'] = measures
+        print(data)
         try:
             query = db.post('app_data_version', data)
         except:
+            print('Noviy povorot')
             return HttpResponse(status=422, content='Database exeption')
         return HttpResponse(query)
-
 
 
 @require_GET
@@ -133,7 +140,7 @@ def measures(request):
     if request.method == 'GET':
         query = db.find("app_data_measure", {'cancel': False})
         items = None
-        if query.count() >  0:
+        if query.count() > 0:
             items = dumps({'items': query})
         result = json.loads(items) if items else {'items': []}
         return JsonResponse(result)
@@ -175,6 +182,8 @@ def update_measure(request, measure_id):
 
     body = request.body
     data = json.loads(body)
+    if not is_valid_update_measure(data):
+        return HttpResponse(status=422, content='Mandatory fields are empty')
     current_date = datetime.datetime.utcnow()
     data['change_date'] = current_date
     data['change_user'] = 'Terminator'
@@ -191,6 +200,8 @@ def update_measure(request, measure_id):
 def update_version(request, vers_id):
     body = request.body
     data = json.loads(body)
+    if not is_valid_update_version(data):
+        return HttpResponse(status=422, content='Mandatory fields are empty')
     current_date = datetime.datetime.utcnow()
     data['change_date'] = current_date
     data['change_user'] = 'Tarsan'
@@ -205,6 +216,7 @@ def update_version(request, vers_id):
 
 @require_GET
 def available_measures(request, topic, code):
+
     try:
         query = db.find(
             "app_data_measure",
@@ -217,11 +229,13 @@ def available_measures(request, topic, code):
     except:
         return HttpResponse(status=422)
     items = None
-    if query.count() > 0:
-        items = dumps({'items': query})
-    result = json.loads(items) if items else {'items': []}
-    return JsonResponse(result)
 
+    if query.count() > 0:
+        k = dumps(query)
+        measures = [{'id': i['_id']['$oid'], 'measure_name': i['measure_name']} for i in json.loads(k)]
+        items = {'items': measures}
+    result = items if items else {'items': []}
+    return JsonResponse(result)
 
 @require_GET
 def get_dec(request):

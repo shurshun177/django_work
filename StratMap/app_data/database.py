@@ -67,6 +67,10 @@ class DataBase:
         res = self.db[collection].insert_one(data)
         return res.inserted_id
 
+    def post_many(self, collection, data_list):  # list of dicts
+        res = self.db[collection].insert_many(data_list)
+        return res.inserted_id
+
     def is_valid_id(self, _id):
         return  (isinstance(_id, str) and re.match("[\d\w]{24}", _id)) or isinstance(_id, ObjectId)
 
@@ -171,10 +175,23 @@ if __name__ == '__main__':
         else:
             res = val + 1
         print(res)
+
+    def test_measures():
+        l = [{'_id': {'$oid': '5c079152326f421a04aa7bce'}, 'measure_name': 'שיעור תפוסה לפי תקן מיטות'},
+              {'_id': {'$oid': '5c079152326f421a04aa7bce'}, 'measure_name': 'שיעור תפוסה לפי תקן מיטות'}]
+        d = {'measure':[{'id': i['_id']['$oid'], 'measure_name': i['measure_name']} for i in l]}
+        print(d)
+        v = DataBase()
+        v.connect()
+        print(v.is_connected())
+        v.post('app_data_version', d)
+
+
     #new_test()
     # canc_false('app_data_version')
     # number_cancel('app_data_version')
-    #del_test('app_data_version', ['5c17bac2326f422f60cec4c2'])
+    # del_test('app_data_decryptiontables', ['5c122e78326f422f60f66b1d'])
     # canc_false('app_data_measure')
     #del_dup()
-    test_get()
+    # test_get()
+    # test_measures()

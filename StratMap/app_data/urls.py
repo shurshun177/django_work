@@ -47,7 +47,7 @@ urlpatterns = [
         views.del_measure
     ),
     url(
-        r'^api/v0/available_measures/(?P<topic>\d+)/(?P<code>\d+)/$',
+        r'^api/v0/available_measures/(?P<code>\d+)/(?P<topic>\d+)/$',
         views.available_measures
     ),
     url(
