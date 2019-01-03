@@ -192,6 +192,6 @@ if __name__ == '__main__':
     # number_cancel('app_data_version')
     # del_test('app_data_decryptiontables', ['5c122e78326f422f60f66b1d'])
     # canc_false('app_data_measure')
-    #del_dup()
+    # del_dup()
     # test_get()
     # test_measures()

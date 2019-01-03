@@ -22,10 +22,13 @@ def del_vers(request, vers_id):
     try:
         query = db.update('app_data_version', data, vers_id)
         if query is None:
-            return HttpResponse(status=404, content='No such version')
+            response = {'status': 'failed', 'reason': 'No such version'}
+            return JsonResponse(status=404, data=response)
     except:
-        return HttpResponse(status=422, content='Invalid id')
-    return HttpResponse(query)
+        response = {'status': 'failed', 'reason': 'Invalid id'}
+        return JsonResponse(status=422, data=response)
+    response = {'status': 'success', 'message': 'Cancel field was updated'}
+    return JsonResponse(response)
 
 
 @require_http_methods(['PUT'])
@@ -38,10 +41,13 @@ def del_measure(request, measure_id):
     try:
         query = db.update('app_data_measure', data, measure_id)
         if query is None:
-            return HttpResponse(status=404, content='No such measure')
+            response = {'status': 'failed', 'reason': 'No such measure'}
+            return JsonResponse(status=404, data=response)
     except:
-        return HttpResponse(status=422, content='Invalid id')
-    return HttpResponse(query)
+        response = {'status': 'failed', 'reason': 'Invalid id'}
+        return JsonResponse(status=422, data=response)
+    response = {'status': 'success', 'message': 'Cancel field was updated'}
+    return JsonResponse(response)
 
 
 def index(request):
@@ -95,29 +101,26 @@ def versions(request):
     elif request.method == 'POST':
         body = request.body
         data = json.loads(body)
-        measures = [{'id': i['_id']['$oid'], 'measure_name': i['measure_name']} for i in data['measures']]
-        print(data)
         if not is_valid_version(data):
-
-            return HttpResponse(status=422, content='Mandatory fields are empty')
+            response = {'status': 'failed', 'reason': 'Mandatory fields are empty'}
+            return JsonResponse(status=422, data=response)
         try:
             number = int(data['version_number'])
         except ValueError:
-
-            return HttpResponse(status=400, content='Number must be integer')
+            response = {'status': 'failed', 'reason': 'Number must be integer'}
+            return JsonResponse(status=400, data=response)
         current_date = datetime.datetime.utcnow()
         data['version_number'] = number
         data['cancel'] = False
         data['create_date'] = current_date
         data['create_user'] = 'Shnur'
-        data['measure'] = measures
-        print(data)
         try:
-            query = db.post('app_data_version', data)
+            db.post('app_data_version', data)
         except:
-            print('Noviy povorot')
-            return HttpResponse(status=422, content='Database exeption')
-        return HttpResponse(query)
+            response = {'status': 'failed', 'reason': 'Database exeption'}
+            return JsonResponse(status=422, data=response)
+        response = {'status': 'success', 'message': 'Version was saved successfully'}
+        return JsonResponse(response)
 
 
 @require_GET
@@ -125,12 +128,14 @@ def get_version(request, vers_id):
     try:
         query = db.get_by_id('app_data_version', vers_id)
     except:
-        return HttpResponse(status=422, content='Invalid id')
+        response = {'status': 'failed', 'reason': 'Invalid id'}
+        return JsonResponse(status=422, data=response)
     items = None
     if query.count() > 0:
         items = dumps({'items': query})
     else:
-        return HttpResponse(status=404, content='No such version')
+        response = {'status': 'failed', 'reason': 'No such version'}
+        return JsonResponse(status=404, data=response)
     result = json.loads(items) if items else {'items': []}
     return JsonResponse(result)
 
@@ -148,18 +153,22 @@ def measures(request):
         body = request.body
         data = json.loads(body)
         if not is_valid_measure(data):
-            return HttpResponse(status=422, content='Empty mandatory fields')
+            response = {'status': 'failed', 'reason': 'Empty mandatory fields'}
+            return JsonResponse(status=422, data=response)
         if not is_valid_code(data['measure_code']):
-            return HttpResponse(status=400)
+            response = {'status': 'failed', 'reason': 'Invalid measure code'}
+            return JsonResponse(status=400, data=response)
         current_date = datetime.datetime.utcnow()
         data['cancel'] = False
         data['create_date'] = current_date
         data['create_user'] = 'Sheldon'
         try:
-            query = db.post('app_data_measure', data)
+            db.post('app_data_measure', data)
         except:
-            return HttpResponse(status=422, content='Unique fields exist')
-        return HttpResponse(query)
+            response = {'status': 'failed', 'reason': 'Unique fields already exist'}
+            return JsonResponse(status=422, data=response)
+        response = {'status': 'success', 'message': 'Measure was saved successfully'}
+        return JsonResponse(response)
 
 
 @require_GET
@@ -167,12 +176,14 @@ def get_measure(request, id):
     try:
         query = db.get_by_id('app_data_measure', id)
     except:
-        return HttpResponse(status=422, content='Invalid id')
+        response = {'status': 'failed', 'reason': 'Invalid id'}
+        return JsonResponse(status=422, data=response)
     items = None
     if query.count() > 0:
         items = dumps({'items': query})
     else:
-        return HttpResponse(status=404, content='No such measure')
+        response = {'status': 'failed', 'reason': 'No such measure'}
+        return JsonResponse(status=404, data=response)
     result = json.loads(items) if items else {'items': []}
     return JsonResponse(result)
 
@@ -183,17 +194,21 @@ def update_measure(request, measure_id):
     body = request.body
     data = json.loads(body)
     if not is_valid_update_measure(data):
-        return HttpResponse(status=422, content='Mandatory fields are empty')
+        response = {'status': 'failed', 'reason': 'Mandatory fields are empty'}
+        return JsonResponse(status=422, data=response)
     current_date = datetime.datetime.utcnow()
     data['change_date'] = current_date
     data['change_user'] = 'Terminator'
     try:
         query = db.update('app_data_measure', data, measure_id)
         if query is None:
-            return HttpResponse(status=404, content='No such measure')
+            response = {'status': 'failed', 'reason': 'No such measure'}
+            return JsonResponse(status=404, data=response)
     except:
-        return HttpResponse(status=422, content='Invalid id')
-    return HttpResponse(query)
+        response = {'status': 'failed', 'reason': 'Invalid id'}
+        return JsonResponse(status=422, data=response)
+    response = {'status': 'success', 'message': 'Measure was updated successfully'}
+    return JsonResponse(response)
 
 
 @require_http_methods(['PUT'])
@@ -201,17 +216,21 @@ def update_version(request, vers_id):
     body = request.body
     data = json.loads(body)
     if not is_valid_update_version(data):
-        return HttpResponse(status=422, content='Mandatory fields are empty')
+        response = {'status': 'failed', 'reason': 'Mandatory fields are empty'}
+        return JsonResponse(status=422, data=response)
     current_date = datetime.datetime.utcnow()
     data['change_date'] = current_date
     data['change_user'] = 'Tarsan'
     try:
         query = db.update('app_data_version', data, vers_id)
         if query is None:
-            return HttpResponse(status=404, content='No such version')
+            response = {'status': 'failed', 'reason': 'No such version'}
+            return JsonResponse(status=404, data=response)
     except:
-        return HttpResponse(status=422, content='Invalid id')
-    return HttpResponse(query)
+        response = {'status': 'failed', 'reason': 'Invalid id'}
+        return JsonResponse(status=422, data=response)
+    response = {'status': 'success', 'message': 'Version was updated successfully'}
+    return JsonResponse(response)
 
 
 @require_GET
@@ -227,9 +246,9 @@ def available_measures(request, topic, code):
             },
             fields={'measure_name'})
     except:
-        return HttpResponse(status=422)
+        response = {'status': 'failed', 'reason': 'No available measures'}
+        return JsonResponse(status=422, data=response)
     items = None
-
     if query.count() > 0:
         k = dumps(query)
         measures = [{'id': i['_id']['$oid'], 'measure_name': i['measure_name']} for i in json.loads(k)]
@@ -237,13 +256,15 @@ def available_measures(request, topic, code):
     result = items if items else {'items': []}
     return JsonResponse(result)
 
+
 @require_GET
 def get_dec(request):
 
     try:
         query = db.find('app_data_decryptiontables')
     except:
-        return HttpResponse(status=422)
+        response = {'status': 'failed', 'reason': 'Database exception'}
+        return JsonResponse(status=422, data=response)
     items = None
     if query.count() > 0:
         items = dumps({'items': query})
@@ -259,7 +280,8 @@ def last_version(request):
     try:
         query = db.get(col, sorted_by=key, ascending=False, limit=1)
     except:
-        return HttpResponse(status=422)
+        response = {'status': 'failed', 'reason': 'Database exception'}
+        return JsonResponse(status=422, data=response)
     val = [i.get('version_number') for i in query][0]
     res = {'vers_number': val + 1}
     return JsonResponse(res)
