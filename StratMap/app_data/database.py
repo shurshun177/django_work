@@ -68,14 +68,18 @@ class DataBase:
 
     def post_many(self, collection, data_list):  # list of dicts
         res = self.db[collection].insert_many(data_list)
-        return res.inserted_id
+        return res
 
     def is_valid_id(self, _id):
         return  (isinstance(_id, str) and re.match("[\d\w]{24}", _id)) or isinstance(_id, ObjectId)
 
-    def delete(self, collection, id):
-        data = {'_id': ObjectId(id)}
+    def delete(self, collection, del_query, id=None):
+        if id:
+            data = {'_id': ObjectId(id)}
+        else:
+            data = del_query
         query = self.db[collection].delete_one(data)
+        return query
 
     def cancel_false(self, col, query, data):
         data = {'$set': data}
@@ -92,11 +96,12 @@ class DataBase:
         if isinstance(value, list):
             data = {'$addToSet': {field_name: {'$each': value}}} # if more then one value,
         else:                                                   # must use list
-            data = {'addToSet': {field_name: value}}         # data = [{'code': '1', 'type': 'חטיבה'}]
+            data = {'$addToSet': {field_name: value}}         # data = [{'code': '1', 'type': 'חטיבה'}]
                 # v.add_to_set('app_data_decryptiontables', {'name': 'hospital_codes'}, 'values_list', data)
         return self.db[col].find_one_and_update(filter=filter,
                                                         update=data,
                                                         return_document=ReturnDocument.AFTER)
+
 
     def search(self, col, search_field, text):
         text = '.*{}.*'.format(text)
@@ -165,7 +170,7 @@ if __name__ == '__main__':
     def post_test():
         v = DataBase()
         v.connect()
-        data = {'hospital_types': {'1':  'ללים' , '2': 'גריאטריים' , '3': 'פסיכיאטריים'}}
+        data = {'hospital_types': [{'1': 'ללים'}, {'2': 'גריאטריים'} , {'3': 'פסיכיאטריים'}]}
         k = v.post('app_data_decryptiontables', data)
 
 
@@ -205,7 +210,41 @@ if __name__ == '__main__':
     def delCodes():
         v = DataBase()
         v.connect()
-        v.del_all('app_data_decryptiontables', {'name': 'hospital_codes'})
+        v.del_all('app_data_decryptiontables', {'name': 'business_topic'})
+
+
+    def create_hosp_codes():
+        v = DataBase()
+        v.connect()
+        values_list = [{'hosp_code': '01103', 'name': 'ביה"ח אסף הרופה', 'type': '1'},
+                       {'hosp_code': '01108', 'name': 'ביה"ח ברזילי', 'type': '1'},
+                       {'hosp_code': '01204', 'name': 'ביה"ח בני ציון', 'type': '1'},
+                       {'hosp_code': '01107', 'name': 'ביה"ח נהריה', 'type': '1'},
+                       {'hosp_code': '01106', 'name': 'ביה"ח הלל יפה', 'type': '1'},
+                       {'hosp_code': '01109', 'name': 'ביה"ח פוריה', 'type': '1'},
+                       {'hosp_code': '01102', 'name': 'ביה"ח רמבם', 'type': '1'},
+                       {'hosp_code': '01201', 'name': 'ביה"ח איכילוב', 'type': '1'},
+                       {'hosp_code': '01104', 'name': 'ביה"ח וולפסון', 'type': '1'},
+                       {'hosp_code': '01105', 'name': 'ביה"ח זיו', 'type': '1'},
+                       {'hosp_code': '01101', 'name': 'ביה"ח שיבה', 'type': '1'},
+                       {'hosp_code': '11101', 'name': 'ביה"ח שער המנשה', 'type': '3'},
+                       {'hosp_code': '11102', 'name': 'ביה"ח יהודה אברבנאל', 'type': '3'},
+                       {'hosp_code': '11103', 'name': 'ביה"ח ע"ש פליגלמן מזור', 'type': '3'},
+                       {'hosp_code': '11104', 'name': 'המרכז לבריאות הנפש בער יעקב', 'type': '3'},
+                       {'hosp_code': '11105', 'name': 'המרכז הרפואי לברה''נ לב השרון', 'type': '3'},
+                       {'hosp_code': '11106', 'name': 'ביה"ח מעלה הכרמל', 'type': '3'},
+                       {'hosp_code': '11107', 'name': 'המרכז לבריאות הנפש בער שבה', 'type': '3'},
+                       {'hosp_code': '11109', 'name': 'מרכז רפואי לבריאות הנפש ירושלים', 'type': '3'},
+                       {'hosp_code': '21101', 'name': 'מרכז רפואי גריאטרי שמואל הרופא', 'type': '2'},
+                       {'hosp_code': '21102', 'name': 'מרכז גריאטרי שיקומי ע''ש פלימן', 'type': '2'},
+                       {'hosp_code': '22101', 'name': 'מרכז הגריאטרי המשולב ע"ש שוהם', 'type': '2'},
+                       {'hosp_code': '22102', 'name': 'מרכז גריאטרי דורות נתניה', 'type': '2'},
+                       {'hosp_code': '22103', 'name': 'מרכז גריאטרי ראשל"צ', 'type': '2'},
+                       {'hosp_code': '31101', 'name': 'מרכז קהילתי לבריאות הנפש', 'type': '2'},
+                       {'hosp_code': '1', 'name': 'חטיבה', 'type': '0'}]
+        data = {'name': 'hospital_codes', 'values_list': values_list}
+        v.post('app_data_decryptiontables', data)
+
     #new_test()
     # canc_false('app_data_version')
     # number_cancel('app_data_version')
@@ -215,5 +254,6 @@ if __name__ == '__main__':
     # test_get()
     # test_measures()
     # print(try_to_add())
-    testSearch('ג')
+    # create_hosp_codes()
     # delCodes()
+    # post_test()

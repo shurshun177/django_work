@@ -13,10 +13,6 @@ version_types = [
 ]
 
 
-active_status = [
-    {'code': '1', 'type': 'פעיל'} ,
-    {'code': '2', 'type': 'לא פעיל'}
-]
 
 
 business_topic = [
