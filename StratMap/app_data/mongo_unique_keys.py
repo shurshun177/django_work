@@ -6,7 +6,6 @@ def vers_unique():
     mydb = myclient["StrategicMap"]
     mycol = mydb["app_data_version"]
     mycol.create_index([
-        ('hospital_type', pymongo.ASCENDING),
         ('version_number', pymongo.DESCENDING)
     ], unique=True)
 
@@ -15,20 +14,28 @@ def meas_unique():
     mydb = myclient["StrategicMap"]
     mycol = mydb["app_data_measure"]
     mycol.create_index([
-        ('measure_code', pymongo.DESCENDING),
-        ('hospital_type', pymongo.ASCENDING)
+        ('measure_code', pymongo.DESCENDING)
     ], unique=True)
 
 
-def acttual_unique():
+def actual_unique():
     mydb = myclient["StrategicMap"]
-    mycol = mydb["app_data_measure"]
+    mycol = mydb["app_data_actualexecution"]
     mycol.create_index([
         ('measure_code', pymongo.DESCENDING),
-        ('hospital_type', pymongo.ASCENDING),
         ('version_number', pymongo.DESCENDING),
         ('hospital_code', pymongo.ASCENDING)
     ], unique=True)
 
+def search_vers():
+    mydb = myclient["StrategicMap"] # search field have to be index
+    mycol = mydb["app_data_version"]
+    mycol.create_index([('version_name', 'text')])
 
-meas_unique()
+def search_measure():
+    mydb = myclient["StrategicMap"]  # search field have to be index
+    mycol = mydb["app_data_measure"]
+    mycol.create_index([('measure_desc', 'text')])
+
+# search_measure()
+

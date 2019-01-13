@@ -6,7 +6,8 @@ from bson.json_util import dumps, loads
 from django.views.decorators.http import require_http_methods, require_GET
 from . valid import is_valid_code, is_valid_version, is_valid_update_version,\
     is_valid_measure, is_valid_update_measure
-from bson.objectid import _ord
+
+
 db = DataBase()
 db.connect()
 
@@ -154,6 +155,7 @@ def measures(request):
         data = json.loads(body)
         if not is_valid_measure(data):
             response = {'status': 'failed', 'reason': 'Empty mandatory fields'}
+
             return JsonResponse(status=422, data=response)
         if not is_valid_code(data['measure_code']):
             response = {'status': 'failed', 'reason': 'Invalid measure code'}
@@ -166,6 +168,7 @@ def measures(request):
             db.post('app_data_measure', data)
         except:
             response = {'status': 'failed', 'reason': 'Unique fields already exist'}
+
             return JsonResponse(status=422, data=response)
         response = {'status': 'success', 'message': 'Measure was saved successfully'}
         return JsonResponse(response)
@@ -286,6 +289,34 @@ def last_version(request):
     res = {'vers_number': val + 1}
     return JsonResponse(res)
 
+
+
+@require_GET
+def versionSearch(request, text):
+    col = 'app_data_version'
+    search_field = 'version_name'
+    text = '.*{}.*'.format(text)
+    query = {search_field: {'$regex': text}}
+    res = db.find(col, query)
+    items = None
+    if res.count() > 0:
+        items = dumps({'items': res})
+    result = json.loads(items) if items else {'items': []}
+    return JsonResponse(result)
+
+
+@require_GET
+def measureSearch(request, text):
+    col = 'app_data_measure'
+    search_field = 'measure_desc'
+    text = '.*{}.*'.format(text)
+    query = {search_field: {'$regex': text}}
+    res = db.find(col, query)
+    items = None
+    if res.count() > 0:
+        items = dumps({'items': res})
+    result = json.loads(items) if items else {'items': []}
+    return JsonResponse(result)
 
 
 

@@ -58,5 +58,13 @@ urlpatterns = [
         r'^api/v0/last_version/$',
         views.last_version
     ),
+    url(
+        r'^api/v0/version/search/(?P<text>\S+)/$',
+        views.versionSearch
+    ),
+    url(
+        r'^api/v0/measure/search/(?P<text>\S+)/$',
+        views.measureSearch
+    ),
 
 ]

@@ -5,7 +5,6 @@ from pymongo import ReturnDocument
 import re
 import datetime
 
-from bson.json_util import dumps
 
 
 class DataBase:
@@ -89,12 +88,23 @@ class DataBase:
     def del_all(self, col, query):
         return self.db[col].delete_many(query)
 
+    def add_to_set(self, col, filter, field_name, value):
+        if isinstance(value, list):
+            data = {'$addToSet': {field_name: {'$each': value}}} # if more then one value,
+        else:                                                   # must use list
+            data = {'addToSet': {field_name: value}}         # data = [{'code': '1', 'type': 'חטיבה'}]
+                # v.add_to_set('app_data_decryptiontables', {'name': 'hospital_codes'}, 'values_list', data)
+        return self.db[col].find_one_and_update(filter=filter,
+                                                        update=data,
+                                                        return_document=ReturnDocument.AFTER)
 
+    def search(self, col, search_field, text):
+        text = '.*{}.*'.format(text)
+        query = self.db[col].find({search_field: {'$regex': text}})
+        return query
 
 
 if __name__ == '__main__':
-
-
 
 
     def up():
@@ -152,7 +162,6 @@ if __name__ == '__main__':
             print('Database exeption')
         return val
 
-
     def post_test():
         v = DataBase()
         v.connect()
@@ -186,7 +195,17 @@ if __name__ == '__main__':
         print(v.is_connected())
         v.post('app_data_version', d)
 
+    def testSearch(text):
+        v = DataBase()
+        v.connect()
+        print(v.is_connected())
+        for i in v.search('app_data_version', 'version_name', text):
+            print(i)
 
+    def delCodes():
+        v = DataBase()
+        v.connect()
+        v.del_all('app_data_decryptiontables', {'name': 'hospital_codes'})
     #new_test()
     # canc_false('app_data_version')
     # number_cancel('app_data_version')
@@ -195,3 +214,6 @@ if __name__ == '__main__':
     # del_dup()
     # test_get()
     # test_measures()
+    # print(try_to_add())
+    testSearch('ג')
+    # delCodes()

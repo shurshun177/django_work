@@ -44,7 +44,10 @@ def is_valid_version(data):
         'version_number',
         'version_name',
         'version_type',
-        'hospital_type'
+        'hospital_type',
+        'measure',
+        'year'
+
         # additional field measure
     )
     for i in fields:
@@ -79,4 +82,6 @@ d = {'version_number': '1004',
 # print(is_valid_code('123.23.765'))
 
 #print(is_valid_number(234))
-print(is_valid_update_version(d))
+# print(is_valid_update_version(d))
+# from StratMap.StratMap.settings import DATABASES
+# print(DATABASES['default']['NAME'], DATABASES['default']['HOST'], sep='\n')
