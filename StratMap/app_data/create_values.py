@@ -1,4 +1,8 @@
-from StratMap.app_data.database import DataBase
+from bson import SON
+if __name__ == '__main__':
+    from database import DataBase
+else:
+    from app_data.database import DataBase
 
 
 
@@ -6,33 +10,43 @@ from StratMap.app_data.database import DataBase
 def create_hosp_codes():
     c = DataBase()
     c.connect()
-    values_list = [{'hosp_code': '01103', 'name': 'ביה"ח אסף הרופה', 'type': '1'},
-                   {'hosp_code': '01108', 'name': 'ביה"ח ברזילי', 'type': '1'},
-                   {'hosp_code': '01204', 'name': 'ביה"ח בני ציון', 'type': '1'},
-                   {'hosp_code': '01107', 'name': 'ביה"ח נהריה', 'type': '1'},
-                   {'hosp_code': '01106', 'name': 'ביה"ח הלל יפה', 'type': '1'},
-                   {'hosp_code': '01109', 'name': 'ביה"ח פוריה', 'type': '1'},
-                   {'hosp_code': '01102', 'name': 'ביה"ח רמבם', 'type': '1'},
-                   {'hosp_code': '01201', 'name': 'ביה"ח איכילוב', 'type': '1'},
-                   {'hosp_code': '01104', 'name': 'ביה"ח וולפסון', 'type': '1'},
-                   {'hosp_code': '01105', 'name': 'ביה"ח זיו', 'type': '1'},
-                   {'hosp_code': '01101', 'name': 'ביה"ח שיבה', 'type': '1'},
-                   {'hosp_code': '11101', 'name': 'ביה"ח שער המנשה', 'type': '3'},
-                   {'hosp_code': '11102', 'name': 'ביה"ח יהודה אברבנאל', 'type': '3'},
-                   {'hosp_code': '11103', 'name': 'ביה"ח ע"ש פליגלמן מזור', 'type': '3'},
-                   {'hosp_code': '11104', 'name': 'המרכז לבריאות הנפש בער יעקב', 'type': '3'},
-                   {'hosp_code': '11105', 'name': 'המרכז הרפואי לברה''נ לב השרון', 'type': '3'},
-                   {'hosp_code': '11106', 'name': 'ביה"ח מעלה הכרמל', 'type': '3'},
-                   {'hosp_code': '11107', 'name': 'המרכז לבריאות הנפש בער שבה', 'type': '3'},
-                   {'hosp_code': '11109', 'name': 'מרכז רפואי לבריאות הנפש ירושלים', 'type': '3'},
-                   {'hosp_code': '21101', 'name': 'מרכז רפואי גריאטרי שמואל הרופא', 'type': '2'},
-                   {'hosp_code': '21102', 'name': 'מרכז גריאטרי שיקומי ע''ש פלימן', 'type': '2'},
-                   {'hosp_code': '22101', 'name': 'מרכז הגריאטרי המשולב ע"ש שוהם', 'type': '2'},
-                   {'hosp_code': '22102', 'name': 'מרכז גריאטרי דורות נתניה', 'type': '2'},
-                   {'hosp_code': '22103', 'name': 'מרכז גריאטרי ראשל"צ', 'type': '2'},
-                   {'hosp_code': '31101', 'name': 'מרכז קהילתי לבריאות הנפש', 'type': '2'},
-                   {'hosp_code': '1', 'name': 'חטיבה', 'type': '0'}]
-    data = {'name': 'hospital_codes', 'values_list': values_list}
+    data = {
+        'name': 'hospital_codes',
+        'type_1': [
+            SON([('hosp_code', '01103'), ('name', 'ביה"ח אסף הרופה'), ('type', '1')]),
+            SON([('hosp_code', '01108'), ('name', 'ביה"ח ברזילי'), ('type', '1')]),
+            SON([('hosp_code', '01204'), ('name', 'ביה"ח בני ציון'), ('type', '1')]),
+            SON([('hosp_code', '01107'), ('name', 'ביה"ח נהריה'), ('type', '1')]),
+            SON([('hosp_code', '01106'), ('name', 'ביה"ח הלל יפה'), ('type', '1')]),
+            SON([('hosp_code', '01109'), ('name', 'ביה"ח פוריה'), ('type', '1')]),
+            SON([('hosp_code', '01102'), ('name', 'ביה"ח רמב"ם'), ('type', '1')]),
+            SON([('hosp_code', '01201'), ('name', 'ביה"ח איכילוב'), ('type', '1')]),
+            SON([('hosp_code', '01104'), ('name', 'ביה"ח וולפסון'), ('type', '1')]),
+            SON([('hosp_code', '01105'), ('name', 'ביה"ח זיו'), ('type', '1')]),
+            SON([('hosp_code', '01101'), ('name', 'ביה"ח שיבה'), ('type', '1')])
+        ],
+        'type_3': [
+            SON([('hosp_code', '11101'), ('name', 'ביה"ח שער המנשה'), ('type', '3')]),
+            SON([('hosp_code', '11102'), ('name', 'ביה"ח יהודה אברבנאל'), ('type', '3')]),
+            SON([('hosp_code', '11103'), ('name', 'ביה"ח ע"ש פליגלמן מזור'), ('type', '3')]),
+            SON([('hosp_code', '11104'), ('name', 'המרכז לבריאות הנפש בער יעקב'), ('type', '3')]),
+            SON([('hosp_code', '11105'), ('name', 'המרכז הרפואי לברהנ לב השרון'), ('type', '3')]),
+            SON([('hosp_code', '11106'), ('name', 'ביה"ח מעלה הכרמל'), ('type', '3')]),
+            SON([('hosp_code', '11107'), ('name', 'המרכז לבריאות הנפש בער שבה'), ('type', '3')]),
+            SON([('hosp_code', '11109'), ('name', 'מרכז רפואי לבריאות הנפש ירושלים'), ('type', '3')])
+        ],
+        'type_2': [
+            SON([('hosp_code', '21101'), ('name', 'מרכז רפואי גריאטרי שמואל הרופא'), ('type', '2')]),
+            SON([('hosp_code', '21102'), ('name', 'מרכז גריאטרי שיקומי ע"ש פלימן'), ('type', '2')]),
+            SON([('hosp_code', '22101'), ('name', 'מרכז הגריאטרי המשולב ע"ש שוהם, פרדס'), ('type', '2')]),
+            SON([('hosp_code', '22102'), ('name', 'מרכז גריאטרי דורות נתניה'), ('type', '2')]),
+            SON([('hosp_code', '22103'), ('name', 'מרכז גריאטרי ראשל"צ'), ('type', '2')]),
+            SON([('hosp_code', '31101'), ('name', 'מרכז קהילתי לבריאות הנפש - יפו'), ('type', '2')])
+        ],
+        'type_0': [
+            SON([('hosp_code', '1'), ('name', 'חטיבה'), ('type', '0')])
+        ]
+    }
     c.post('app_data_decryptiontables', data)
 
 
@@ -43,13 +57,13 @@ def create_business_topic():
             {'code': '1', 'name': 'תקן איוש ונלוות', 'sub_topic': [
                 {'code': '11','name': 'תקן מוך איוש'},
                 {'code': '12','name': 'כמויות נלוות'},
-                {'code': '13','name': 'כמויות נלוות - מתוקן לאיוש'}
+                {'code': '13','name': 'כמויות נלוות - מתוקנן לאיוש'}
                 ]
              },
             {'code': '2', 'name': 'פעילות', 'sub_topic': [
                 {'code': '21','name': 'כלל מחלקות האשפוז'},
                 {'code': '22','name': 'אגף פנימי'},
-                {'code': '23','name': 'מלר''ד'},
+                {'code': '23','name': 'מלר"ד'},
                 {'code': '24', 'name': 'טיפול נמרץ בילוד, טיפול מיוחד בילוד'},
                 {'code': '25', 'name': 'יולדות'},
                 {'code': '26', 'name': 'ניתוחים'},
@@ -58,7 +72,7 @@ def create_business_topic():
                 ]
              },
             {'code': '3', 'name': 'חווית המטופל', 'sub_topic': [
-                {'code': '31','name': 'מלר''ד'},
+                {'code': '31','name': 'מלר"ד'},
                 {'code': '32','name': 'זימון וניהול תור'},
                 {'code': '33','name': 'ביצוע סקרי שביעות רצון'},
                 {'code': '34', 'name': 'אשפוז באגף הפנימי'}
@@ -96,7 +110,7 @@ def create_business_topic():
             {'code': '8', 'name': 'תשתית טכנולוגית', 'sub_topic': [
                 {'code': '81','name': 'איכות הקידוד הרפואי'},
                 {'code': '82','name': 'שדרוג תשתית טכנולוגית'},
-                {'code': '83','name': 'היקף ההשקעה במחשוב'}
+                {'code': '83','name': 'היקף השקעה במחשוב'}
                 ]
             }
         ]
@@ -151,3 +165,6 @@ def create_measure_types():
     ]
     data = {'name': 'measure_types', 'values_list': values_list}
     a.post('app_data_decryptiontables', data)
+
+
+

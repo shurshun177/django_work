@@ -4,12 +4,7 @@ from . import views
 
 urlpatterns = [
     url(
-        r'^api/v0/$',
-        views.index,
-        name='v'
-    ),
-    url(
-        r'^api/v0/test/$',
+        r'^api/v0/post-test/$',
         views.index_0
     ),
     url(r'^api/v0/versions/$',
@@ -66,5 +61,24 @@ urlpatterns = [
         r'^api/v0/measure/search/(?P<text>\S+)/$',
         views.measureSearch
     ),
-
+    url(
+        r'^api/v0/auth$',
+        views.entry
+    ),
+    url(
+        r'^api/v0/average/(?P<type>\d+)/(?P<year>\d+)/$',
+        views.national_average
+    ),
+    url(
+        r'^api/v0/hospitals/(?P<hosp_type>\d+)/$',
+        views.getHosp
+    ),
+    url(
+        r'^api/v0/division/(?P<hosp>\d+)/(?P<topic>\d+)/$',
+        views.division
+    ),
+    url(
+        r'^api/v0/hospital_report/(?P<hosp>\d+)/(?P<topic>\d+)/$',
+        views.hospReport
+    ),
 ]

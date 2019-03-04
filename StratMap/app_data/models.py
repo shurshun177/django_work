@@ -9,15 +9,15 @@ from django.contrib.auth.models import User
 
 
 class Version(models.Model):
-    version_number = models.IntegerField(default=1000)
-    hospital_type = models.CharField(max_length=16)
-    version_name = models.CharField(max_length=72)
-    version_type = models.CharField(max_length=12)
-    version_desc = models.CharField(max_length=121)
-    active = models.BooleanField(max_length=1)
+    version_number = models.IntegerField(default=1000) # ***
+    hospital_type = models.CharField(max_length=16) # ***
+    version_name = models.CharField(max_length=72) # ***
+    version_type = models.CharField(max_length=12) #
+    version_desc = models.CharField(max_length=121) #
+    active = models.BooleanField(max_length=1) #
     #hospital_code = models.CharField()      #??????????
     #business_topic = models.CharField()
-    measure = models.ArrayReferenceField(blank=True, to='Measure')
+    measure = models.ArrayReferenceField(blank=True, to='Measure') #
     create_date = models.DateField(auto_now=True, blank=True)
     create_user = models.CharField(
         max_length=28,
@@ -49,25 +49,25 @@ class Version(models.Model):
 
 
 class Measure(models.Model):
-    measure_code = models.CharField(max_length=32)
-    hospital_type = models.CharField(max_length=1)
-    measure_name = models.CharField(max_length=64)
-    measure_desc = models.TextField(max_length=200)
-    business_topic = models.CharField(max_length=24)
-    criteria_inclusion = models.CharField(max_length=72)
-    removal_criteria = models.CharField(max_length=72)
-    numerator = models.CharField(max_length=64)
-    denominator = models.CharField(max_length=64)
-    measure_type = models.CharField(max_length=64)
-    measuring_frequency = models.CharField(max_length=64)
-    measure_unit = models.IntegerField()
-    digit_num = models.IntegerField()
+    measure_code = models.CharField(max_length=32) #
+    hospital_type = models.CharField(max_length=1) #
+    measure_name = models.CharField(max_length=64) #
+    measure_desc = models.TextField(max_length=200) #
+    business_topic = models.CharField(max_length=24) #
+    criteria_inclusion = models.CharField(max_length=72) #
+    removal_criteria = models.CharField(max_length=72) #
+    numerator = models.CharField(max_length=64) #
+    denominator = models.CharField(max_length=64) #
+    measure_type = models.CharField(max_length=64) #
+    measuring_frequency = models.CharField(max_length=64) #
+    measure_unit = models.IntegerField() #
+    digit_num = models.IntegerField() #
     separate_thousands = models.BooleanField(max_length=1)
     active = models.BooleanField(max_length=1)
     from_date = models.DateField()
     to_date = models.DateField()
-    target_default = models.FloatField(default=100)
-    remarks = models.TextField(
+    target_default = models.FloatField(default=100) #
+    remarks = models.TextField( #
         max_length=484,
         blank=True,
     )
@@ -140,3 +140,5 @@ class ActualExecution(models.Model):
 class DecryptionTables(models.Model):
     name = models.CharField(max_length=32)
     values_list = models.ListField()
+
+

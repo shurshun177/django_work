@@ -3,15 +3,26 @@ from pymongo import ASCENDING, DESCENDING
 from bson.objectid import ObjectId
 from pymongo import ReturnDocument
 import re
+import os
+
 import datetime
+if __name__ == '__main__':
+    from settings import DATABASES
+else:
+
+    from app_data.settings import DATABASES
+
 
 
 
 class DataBase:
 
+    db_host = DATABASES['default']['HOST']
+    db_port = DATABASES['default']['PORT']
+    name = DATABASES['default']['NAME']
     def __init__(self):
-        self.host = '192.168.34.6:27017'
-        self.db_name = 'StrategicMap'
+        self.host = '{}:{}'.format(self.db_host, self.db_port)
+        self.db_name = self.name
         self.client = None
         self.db = None
 
@@ -47,12 +58,14 @@ class DataBase:
         res = self.db[col].find(filter=query, sort=sort, projection=fields, skip=skip, limit=limit)
         return res
 
-    def update(self, col, data, id):
+    def update(self, col, data, id=None, req=None):
         if id and self.is_valid_id(id):
             query = {'_id': ObjectId(id)}
-            data = {'$set': data}
-            return self.db[col].find_one_and_update(filter=query, update=data,
-                                                    return_document=ReturnDocument.AFTER)
+        else:
+            query = req
+        data = {'$set': data}
+        return self.db[col].find_one_and_update(filter=query, update=data,
+                                                return_document=ReturnDocument.AFTER)
 
     def get_by_id(self, collection, id):
 
@@ -89,7 +102,7 @@ class DataBase:
     def exists(self, col, query={}):
         return self.db[col].count(filter=query)
 
-    def del_all(self, col, query):
+    def del_all(self, col, query={}):
         return self.db[col].delete_many(query)
 
     def add_to_set(self, col, filter, field_name, value):
@@ -110,7 +123,6 @@ class DataBase:
 
 
 if __name__ == '__main__':
-
 
     def up():
         v = DataBase()
@@ -151,8 +163,7 @@ if __name__ == '__main__':
         v = DataBase()
         v.connect()
         print(v.is_connected())
-        v.del_all('app_data_version', {'version_name': ''})
-        v.del_all('app_data_measure', {'measure_name': ''})
+        v.del_all('app_data_version')
 
 
     def dec_tab(name):
@@ -210,50 +221,53 @@ if __name__ == '__main__':
     def delCodes():
         v = DataBase()
         v.connect()
-        v.del_all('app_data_decryptiontables', {'name': 'business_topic'})
+        v.del_all('app_data_version')
 
 
-    def create_hosp_codes():
+    def test_vers_update():
         v = DataBase()
         v.connect()
-        values_list = [{'hosp_code': '01103', 'name': 'ביה"ח אסף הרופה', 'type': '1'},
-                       {'hosp_code': '01108', 'name': 'ביה"ח ברזילי', 'type': '1'},
-                       {'hosp_code': '01204', 'name': 'ביה"ח בני ציון', 'type': '1'},
-                       {'hosp_code': '01107', 'name': 'ביה"ח נהריה', 'type': '1'},
-                       {'hosp_code': '01106', 'name': 'ביה"ח הלל יפה', 'type': '1'},
-                       {'hosp_code': '01109', 'name': 'ביה"ח פוריה', 'type': '1'},
-                       {'hosp_code': '01102', 'name': 'ביה"ח רמבם', 'type': '1'},
-                       {'hosp_code': '01201', 'name': 'ביה"ח איכילוב', 'type': '1'},
-                       {'hosp_code': '01104', 'name': 'ביה"ח וולפסון', 'type': '1'},
-                       {'hosp_code': '01105', 'name': 'ביה"ח זיו', 'type': '1'},
-                       {'hosp_code': '01101', 'name': 'ביה"ח שיבה', 'type': '1'},
-                       {'hosp_code': '11101', 'name': 'ביה"ח שער המנשה', 'type': '3'},
-                       {'hosp_code': '11102', 'name': 'ביה"ח יהודה אברבנאל', 'type': '3'},
-                       {'hosp_code': '11103', 'name': 'ביה"ח ע"ש פליגלמן מזור', 'type': '3'},
-                       {'hosp_code': '11104', 'name': 'המרכז לבריאות הנפש בער יעקב', 'type': '3'},
-                       {'hosp_code': '11105', 'name': 'המרכז הרפואי לברה''נ לב השרון', 'type': '3'},
-                       {'hosp_code': '11106', 'name': 'ביה"ח מעלה הכרמל', 'type': '3'},
-                       {'hosp_code': '11107', 'name': 'המרכז לבריאות הנפש בער שבה', 'type': '3'},
-                       {'hosp_code': '11109', 'name': 'מרכז רפואי לבריאות הנפש ירושלים', 'type': '3'},
-                       {'hosp_code': '21101', 'name': 'מרכז רפואי גריאטרי שמואל הרופא', 'type': '2'},
-                       {'hosp_code': '21102', 'name': 'מרכז גריאטרי שיקומי ע''ש פלימן', 'type': '2'},
-                       {'hosp_code': '22101', 'name': 'מרכז הגריאטרי המשולב ע"ש שוהם', 'type': '2'},
-                       {'hosp_code': '22102', 'name': 'מרכז גריאטרי דורות נתניה', 'type': '2'},
-                       {'hosp_code': '22103', 'name': 'מרכז גריאטרי ראשל"צ', 'type': '2'},
-                       {'hosp_code': '31101', 'name': 'מרכז קהילתי לבריאות הנפש', 'type': '2'},
-                       {'hosp_code': '1', 'name': 'חטיבה', 'type': '0'}]
-        data = {'name': 'hospital_codes', 'values_list': values_list}
-        v.post('app_data_decryptiontables', data)
+        data = {
+            'active': False,
+            'measure': [
+                {'id': '5c3f057d326f4218684a8f28', 'measure_name': 'מבחן'},
+                {'id': '5c3efdaf326f4218684a8f24', 'measure_name': 'מדד השני'}
+            ],
+            'version_desc': '',
+            'version_name': 'גרסה ב',
+            'version_type': '1',
+            'version_number': '1020',
+            'hospital_type': '1'
+        }
+
+        v.post('app_data_version', data)
+
+    def search_vers(text):
+        v = DataBase()
+        v.connect()
+        print(v.is_connected())
+        t = int(text)
+        col = 'app_data_version'
+        search_field = 'version_number'
+        print(t)
+        text_str = '.*{}.*'.format(text)
+        query = {'cancel': False, search_field: {'$regex': text_str}}
+        res = v.find(col, query)
+        print(res.count())
+        for i in res:
+            print(i)
+
 
     #new_test()
-    # canc_false('app_data_version')
+    canc_false('app_data_version')
     # number_cancel('app_data_version')
     # del_test('app_data_decryptiontables', ['5c122e78326f422f60f66b1d'])
-    # canc_false('app_data_measure')
+    canc_false('app_data_measure')
     # del_dup()
     # test_get()
     # test_measures()
     # print(try_to_add())
-    # create_hosp_codes()
+    # test_vers_update()
     # delCodes()
     # post_test()
+    # search_vers('1000')

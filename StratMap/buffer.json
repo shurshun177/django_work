@@ -1,0 +1,1 @@
+{"DEBUG": false, "DATABASE_NAME": "StrategicMap", "DATABASE_HOST": "192.168.34.6", "DATABASE_PORT": "27017", "ALLOWED_HOSTS": ["*"]}
